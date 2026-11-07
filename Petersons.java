@@ -28,6 +28,21 @@ class Petersons extends CriticalSection_Base {
 
 	}
 
+	boolean AnyTrue(int i, int k) {
+		boolean exists;
+		do {
+			exists = false;
+			for(int j = 0; j < n; j++) {
+				if(j!=i) {
+					if(flags[j] >= k) {
+					exists = true;
+					break;
+					}
+				}
+			}
+
+		} while (exists && turn[k] == i);
+	}
 
 	@Override
 	void EntrySection (Worker thread) {
@@ -35,6 +50,7 @@ class Petersons extends CriticalSection_Base {
 		for(int i = 0; i < n-1; i++) {
 			flags.set(thread.id,i);
 			turns.set(k,thread.id);
+			while(AnyTrue(thread.id,i)) {};
 		}
 
 	}
@@ -42,7 +58,7 @@ class Petersons extends CriticalSection_Base {
 	@Override
 	void ExitSection (Worker thread) {
 		ends.set(thread.id,(int)System.currentTimeMillis());
-		mut = 0;
+		flags.set(thread.id,-1);
 		dones.set(thread.id,1);
 		System.out.print("thread "+thread.id+" exit\n");
 
