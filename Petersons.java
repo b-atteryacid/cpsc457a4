@@ -15,6 +15,11 @@ class Petersons extends CriticalSection_Base {
 	Petersons (Integer max_threads) {
 		flags = new AtomicIntegerArray(max_threads);
 		turns = new AtomicIntegerArray(max_threads);
+
+		starts = new AtomicIntegerArray(max_threads);
+		ends = new AtomicIntegerArray(max_threads);
+		dones = new AtomicIntegerArray(max_threads);
+
 		n = max_threads;
 		for (int i = 0; i < max_threads; i++) {
 			flags[i] = -1;
@@ -23,25 +28,25 @@ class Petersons extends CriticalSection_Base {
 		}
 
 		for(int i = 0; i < max_threads; i++) {
-					new Worker(this,i).start();
+			new Worker(this,i).start();
 		}
 
 	}
 
-	boolean AnyTrue(int i, int k) {
+	void WaitforTrue(int i, int k) {
 		boolean exists;
 		do {
 			exists = false;
 			for(int j = 0; j < n; j++) {
 				if(j!=i) {
-					if(flags[j] >= k) {
+					if(flags.get(j) >= k) {
 					exists = true;
 					break;
 					}
 				}
 			}
 
-		} while (exists && turn[k] == i);
+		} while (exists && turns.get(k) == i);
 	}
 
 	@Override
@@ -49,8 +54,8 @@ class Petersons extends CriticalSection_Base {
 		starts.set(thread.id,(int)System.currentTimeMillis());
 		for(int i = 0; i < n-1; i++) {
 			flags.set(thread.id,i);
-			turns.set(k,thread.id);
-			while(AnyTrue(thread.id,i)) {};
+			turns.set(i,thread.id);
+			WaitForTrue(thread.id,i);
 		}
 
 	}
