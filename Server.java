@@ -4,19 +4,30 @@ class Server {
 
 	static void main () {
 		//Unfair unfair = new Unfair(10);
-		Petersons peterson = new Petersons(10);
-		for(int i = 0; i < peterson.n; i++) {
-			new Worker(peterson,i).start();
-		}
 
-		int sumDurs = 0;
+		int[] avdurs = new int[100];
 
-		for(int i = 0; i < peterson.n; i++) {
-			while(peterson.dones.get(i) == 0) {};
-			int thisDur = peterson.ends.get(i)-peterson.starts.get(i);
-			System.out.println("thread "+i+" took "+thisDur+"ms turnaround!\n");
+		for (int i = 2; i < 100; i++) {
+			Unfair cs = new Unfair(i);
+			for(int j = 0; j < cs.n; j++) {
+				new Worker(cs,j).start();
+			}
+
+					int sumDurs = 0;
+
+		for(int j = 0; j < cs.n; j++) {
+			while(cs.dones.get(j) < 5) {};
+			int thisDur = cs.ends.get(j)-cs.starts.get(j);
+			System.out.println("thread "+j+" took "+thisDur+"ms turnaround!\n");
 			sumDurs += thisDur;
 		}
-		System.out.println("average: "+sumDurs/peterson.n+"ms for "+peterson.n+" threads!\n");
+		System.out.println("average: "+sumDurs/cs.n+"ms for "+cs.n+" threads!\n");
+		avdurs[i] = sumDurs/cs.n;
+		}
+
+		for(int i = 0; i < 100; i++) {
+			System.out.print("RESULT FOR "+i+": AV "+avdurs[i]+"ms\n");
+		}
+
 	}
 }

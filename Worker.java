@@ -10,6 +10,7 @@ class Worker extends Thread {
 	}
 
 	public void run () {
+	for(int i = 0; i < 5; i++) {
 		critical_section.EntrySection (this);
 		try {
 			critical_section.CriticalSection (this);
@@ -17,5 +18,6 @@ class Worker extends Thread {
 		catch (InterruptedException e) {
 		}
 		critical_section.ExitSection (this);
+		}
 	}
 }

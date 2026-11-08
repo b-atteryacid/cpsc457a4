@@ -7,43 +7,51 @@ class Unfair extends CriticalSection_Base {
 	AtomicIntegerArray ends;
 	AtomicIntegerArray dones;
 
-	volatile int mut = 0;
+	AtomicIntegerArray flags;
+	volatile boolean inCS = false;
+
+	int n = 0;
+
 	Unfair (Integer max_threads) {
 
 		starts = new AtomicIntegerArray(max_threads);
 		ends = new AtomicIntegerArray(max_threads);
 		dones = new AtomicIntegerArray(max_threads);
 
+		flags = new AtomicIntegerArray(max_threads);
+
+		n = max_threads;
+
 		for(int i = 0; i < max_threads; i++) {
 			dones.set(i,0);
-			new Worker(this,i).start();
+			flags.set(i,0);
 		}
-
-		int sumDurs = 0;
-
-		for(int i = 0; i < max_threads; i++) {
-			while(dones.get(i) == 0) {};
-			int thisDur = ends.get(i)-starts.get(i);
-			System.out.println("thread "+i+" took "+thisDur+"ms\n");
-			sumDurs += thisDur;
-		}
-		System.out.println("average: "+sumDurs/max_threads+"ms for "+max_threads+" threads!\n");
 	}
+
 
 	@Override
 	void EntrySection (Worker thread) {
+	if(dones.get(thread.id) == 0){
 		starts.set(thread.id,(int)System.currentTimeMillis());
-		while(mut == 1) {};
-		mut = 1;
-		System.out.print("thread "+thread.id+"entry\n");
+		}
+		flags.set(thread.id,1);
+		while(inCS){};
+		for(int i = 0; i < thread.id; i++) {
+			while(flags.get(i) > 0 || inCS) {};
+		}
+		inCS = true;
 	}
 
 	@Override
 	void ExitSection (Worker thread) {
+		flags.set(thread.id,0);
+		inCS = false;
+
+				if(dones.get(thread.id) >= 4) {
 		ends.set(thread.id,(int)System.currentTimeMillis());
-		mut = 0;
-		dones.set(thread.id,1);
-		System.out.print("thread "+thread.id+" exit\n");
+		}
+		dones.set(thread.id,dones.get(thread.id)+1);
+
 
 	}
 };

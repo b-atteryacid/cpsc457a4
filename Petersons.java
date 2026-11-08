@@ -20,8 +20,6 @@ class Petersons extends CriticalSection_Base {
 		ends = new AtomicIntegerArray(max_threads);
 		dones = new AtomicIntegerArray(max_threads);
 
-		System.out.print("PET CONSTR!\n");
-
 		n = max_threads;
 		for (int i = 0; i < max_threads; i++) {
 			flags.set(i,-1);
@@ -48,7 +46,9 @@ class Petersons extends CriticalSection_Base {
 
 	@Override
 	void EntrySection (Worker thread) {
+	if(dones.get(thread.id) == 0){
 		starts.set(thread.id,(int)System.currentTimeMillis());
+		}
 		for(int i = 0; i < n-1; i++) {
 			flags.set(thread.id,i);
 			turns.set(i,thread.id);
@@ -59,10 +59,10 @@ class Petersons extends CriticalSection_Base {
 
 	@Override
 	void ExitSection (Worker thread) {
+				if(dones.get(thread.id) >= 4) {
 		ends.set(thread.id,(int)System.currentTimeMillis());
+		}
 		flags.set(thread.id,-1);
-		dones.set(thread.id,1);
-		//System.out.print("thread "+thread.id+" exit\n");
-
+		dones.set(thread.id,dones.get(thread.id)+1);
 	}
 };
