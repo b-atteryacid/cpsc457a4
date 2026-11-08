@@ -29,20 +29,6 @@ class Petersons extends CriticalSection_Base {
 			dones.set(i,0);
 		}
 
-		for(int i = 0; i < max_threads; i++) {
-			new Worker(this,i).start();
-		}
-
-		int sumDurs = 0;
-
-		for(int i = 0; i < max_threads; i++) {
-			while(dones.get(i) == 0) {};
-			int thisDur = ends.get(i)-starts.get(i);
-			System.out.println("thread "+i+" took "+thisDur+"ms turnaround!\n");
-			sumDurs += thisDur;
-		}
-		System.out.println("average: "+sumDurs/max_threads+"ms for "+max_threads+" threads!\n");
-
 	}
 
 	void WaitForTrue(int i, int k) {

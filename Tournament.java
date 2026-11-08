@@ -11,9 +11,9 @@ class Tournament extends CriticalSection_Base {
 	int ceillog2n = 0;
 
 	Tournament (Integer max_threads) {
-		cs = new Petersons(max_threads-1);
+		cs = new Petersons[max_threads-1];
 		n = max_threads;
-		ceillog2n = Math.ceil(Math.log(n)/Math.log(2));
+		ceillog2n = (int)Math.ceil(Math.log(n)/Math.log(2));
 		pids = new AtomicIntegerArray(n*ceillog2n); // cant have 2d of this array so just multiply into 1d
 	}
 
