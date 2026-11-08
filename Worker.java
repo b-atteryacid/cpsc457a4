@@ -15,7 +15,6 @@ class Worker extends Thread {
 			critical_section.CriticalSection (this);
 		}
 		catch (InterruptedException e) {
-		System.out.print("SAFETY GONE!!!\n");
 		}
 		critical_section.ExitSection (this);
 	}
