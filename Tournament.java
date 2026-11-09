@@ -64,7 +64,9 @@ class Tournament extends CriticalSection_Base {
 		cs[csid].ExitSection(tempthread);
 		thread.id = previd;
 		csid = 2*csid + pids.get(thread.id*ceillog2n+lev);
-		dones.set(thread.id,dones.get(thread.id)+1);
+
 		}
+
+		dones.set(thread.id,dones.get(thread.id)+1);
 	}
 };

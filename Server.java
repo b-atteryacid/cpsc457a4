@@ -12,7 +12,7 @@ class Server {
 		}
 
 		for (int i = 2; i < 100; i*=2) {
-			Petersons cs = new Petersons(i);
+			Tournament cs = new Tournament(i);
 			for(int j = 0; j < cs.n; j++) {
 				new Worker(cs,j).start();
 			}
