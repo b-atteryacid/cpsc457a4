@@ -7,8 +7,12 @@ class Server {
 
 		int[] avdurs = new int[100];
 
-		for (int i = 2; i < 100; i++) {
-			Unfair cs = new Unfair(i);
+		for (int i = 0; i < 100; i++) {
+		avdurs[i] = 0;
+		}
+
+		for (int i = 2; i < 100; i*=2) {
+			Petersons cs = new Petersons(i);
 			for(int j = 0; j < cs.n; j++) {
 				new Worker(cs,j).start();
 			}
