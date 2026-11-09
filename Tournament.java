@@ -37,11 +37,15 @@ class Tournament extends CriticalSection_Base {
 	@Override
 	void EntrySection (Worker thread) {
 		int csid = thread.id + n;
-	if(dones.get(thread.id) == 0){
-		starts.set(thread.id,(int)System.currentTimeMillis());
+		if(dones.get(thread.id) == 0){
+			starts.set(thread.id,(int)System.currentTimeMillis());
 		}
 		for(int lev = 0; lev < ceillog2n; lev++) {
 			pids.set(thread.id*ceillog2n+lev,csid%2);
+
+			// we need to call the peterson's 2-solution with a thread id of either 0 or 1
+			// since the function can only take a Worker object, we need to create a temp one
+			// with this new id
 			Worker tempthread = thread;
 			int previd = thread.id;
 			tempthread.id = pids.get(thread.id*ceillog2n+lev);
@@ -54,17 +58,24 @@ class Tournament extends CriticalSection_Base {
 	@Override
 	void ExitSection (Worker thread) {
 		int csid = 1;
-				if(dones.get(thread.id) >= 4) {
-		ends.set(thread.id,(int)System.currentTimeMillis());
-		}
-		for(int lev = ceillog2n-1; lev >= 0; lev--) {
-					Worker tempthread = thread;
-								int previd = thread.id;
-			tempthread.id = pids.get(thread.id*ceillog2n+lev);
-		cs[csid].ExitSection(tempthread);
-		thread.id = previd;
-		csid = 2*csid + pids.get(thread.id*ceillog2n+lev);
 
+
+		// slide 101
+		// go back down, exit all the other cs in the tree
+		for(int lev = ceillog2n-1; lev >= 0; lev--) {
+			Worker tempthread = thread;
+			int previd = thread.id;
+			tempthread.id = pids.get(thread.id*ceillog2n+lev);
+			if(csid < n) {
+				cs[csid].ExitSection(tempthread);
+			}
+			thread.id = previd;
+			csid = 2*csid + pids.get(thread.id*ceillog2n+lev);
+
+		}
+
+		if(dones.get(thread.id) >= 4) {
+			ends.set(thread.id,(int)System.currentTimeMillis()); // end times measured across all 5 entries
 		}
 
 		dones.set(thread.id,dones.get(thread.id)+1);
